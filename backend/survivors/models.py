@@ -1,14 +1,12 @@
 from django.db import models
-import uuid
 
 class Survivor(models.Model):
+    id = models.AutoField(primary_key=True)  # Chave primária de auto-incremento
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     gender = models.CharField(max_length=10)
     last_location = models.CharField(max_length=255)  # Aumentando o tamanho do campo
     infected = models.BooleanField(default=False)
-    unique_code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    # Adicionar outros campos conforme necessário
 
     def __str__(self):
         return self.name

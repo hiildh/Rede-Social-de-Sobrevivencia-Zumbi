@@ -4,7 +4,7 @@ from .models import Survivor, Inventory
 class SurvivorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Survivor
-        exclude = ('unique_code',)
+        fields = '__all__'
 
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:

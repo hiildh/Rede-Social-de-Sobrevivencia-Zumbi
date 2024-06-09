@@ -18,27 +18,36 @@
     export default {
         name: 'SurvivorProfile',
         data() {
-        return {
-            survivor: null,
-        };
+            return {
+                survivor: null
+            };
         },
         created() {
-        this.fetchSurvivorData();
+            this.fetchSurvivorData();
         },
         methods: {
-        async fetchSurvivorData() {
-            const uniqueCode = this.$route.params.uniqueCode;
-            try {
-            const response = await fetch(`http://localhost:8000/api/survivors/${uniqueCode}/`);
-            const data = await response.json();
-            this.survivor = data;
-            } catch (error) {
-            console.error('Erro ao buscar dados do sobrevivente:', error);
+            async fetchSurvivorData() {
+                const name = this.$route.params.name;
+                try {
+                    const response = await fetch(`http://localhost:8000/api/survivors/?name=${name}`);
+                    if (response.ok) {
+                    const survivors = await response.json();
+                    if (survivors.length > 0) {
+                        this.survivor = survivors[0];
+                    } else {
+                        throw new Error('Sobrevivente não encontrado');
+                    }
+                    } else {
+                    throw new Error('Erro ao buscar dados do sobrevivente');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar dados do sobrevivente:', error);
+                }
             }
-        },
-        },
+        }
     };
 </script>
+
 
 <style>
     /* Estilos para o perfil */

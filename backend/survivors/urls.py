@@ -1,12 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import SurvivorViewSet, InventoryViewSet, register_survivor
+from .views import SurvivorViewSet, InventoryViewSet, register_survivor, current_survivor, survivor_inventory, get_survivor_by_name
 
 router = DefaultRouter()
-router.register(r'survivors', SurvivorViewSet)
-router.register(r'inventories', InventoryViewSet)
+router.register(r'survivors', SurvivorViewSet, basename='survivor')
+router.register(r'inventories', InventoryViewSet, basename='inventory')
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('register-survivor/', register_survivor, name='register-survivor'),
+    path('survivors/current/', current_survivor, name='current-survivor'),
+    path('survivors/inventory/<int:survivor_id>/', survivor_inventory, name='survivor-inventory'),
+    path('survivors/get-by-name/', get_survivor_by_name, name='get-survivor-by-name'),
+    path('api/', include(router.urls)),
 ]
