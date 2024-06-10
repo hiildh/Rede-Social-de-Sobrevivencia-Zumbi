@@ -59,15 +59,18 @@ class SurvivorViewSet(viewsets.ModelViewSet):
     serializer_class = SurvivorSerializer
     lookup_field = 'name'
 
-    @action(detail=True, methods=['post'])
-    def update_location(self, request, pk=None):
+    @action(detail=True, methods=['patch'])
+    def update_location(self, request, name=None):
         survivor = self.get_object()
+        print("Localização atual:", survivor.last_location)
         survivor.last_location = request.data.get('last_location')
+        print("Nova localização:", survivor.last_location)
         survivor.save()
+        print("Localização atualizada:", survivor.last_location)
         return Response({'status': 'location updated'})
-
+    
     @action(detail=True, methods=['post'])
-    def mark_infected(self, request, pk=None):
+    def mark_infected(self, request, name=None):
         survivor = self.get_object()
         survivor.infected = True
         survivor.save()

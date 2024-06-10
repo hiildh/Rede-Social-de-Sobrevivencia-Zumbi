@@ -22,9 +22,9 @@
             <div class="opcoes">
                 <h3>Opções</h3>
                 <ul class="submenu">
-                    <li><router-link :to="`/update-location/${survivor.id}`">Atualizar Localização</router-link></li>
-                    <li><router-link :to="`/report-infection/${survivor.id}`">Marcar como Infectado</router-link></li>
-                    <li><router-link :to="`/trade-items/${survivor.id}`">Trocar Itens</router-link></li>
+                    <li><router-link :to="`/update-location/${survivor.survivor.name}`">Atualizar Localização</router-link></li>
+                    <li><router-link :to="`/report-infection/${survivor.survivor.name}`">Marcar como Infectado</router-link></li>
+                    <li><router-link :to="`/trade-items/${survivor.survivor.name}`">Trocar Itens</router-link></li>
                     <li><router-link to="/reports">Relatórios</router-link></li>
                 </ul>
             </div>

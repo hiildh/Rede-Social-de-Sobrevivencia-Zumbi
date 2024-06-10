@@ -15,7 +15,7 @@ const routes = [
   { path: '/login', component: LoginPage },
   { path: '/profile/:uniqueCode', component: SurvivorProfile },
   { path: '/dashboard/:name', name: 'Dashboard', component: DashboardPage }, 
-  { path: '/update-location', component: UpdateLocation },
+  { path: '/update-location/:name', component: UpdateLocation },
   { path: '/report-infection', component: ReportInfection },
   { path: '/trade-items', component: TradeItems },
   { path: '/reports', component: ReportsPage }
