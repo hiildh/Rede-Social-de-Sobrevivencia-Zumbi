@@ -16,7 +16,7 @@ const routes = [
   { path: '/profile/:uniqueCode', component: SurvivorProfile },
   { path: '/dashboard/:name', name: 'Dashboard', component: DashboardPage }, 
   { path: '/update-location/:name', component: UpdateLocation },
-  { path: '/report-infection', component: ReportInfection },
+  { path: '/report-infection/:name', component: ReportInfection },
   { path: '/trade-items', component: TradeItems },
   { path: '/reports', component: ReportsPage }
 ];

@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
-from .models import Survivor, Inventory
+from .models import InfectionReport, Survivor, Inventory
 from .serializers import SurvivorSerializer, InventorySerializer
 
 @api_view(['POST'])
@@ -36,7 +36,7 @@ def survivor_inventory(request, survivor_id):
         serializer = InventorySerializer(inventory)
         return Response(serializer.data)
     except Inventory.DoesNotExist:
-        return Response({'error': 'Inventory not found'}, status=404)
+        return Response({'error': 'Inventorio não encontrado'}, status=404)
 
 @api_view(['GET'])
 def get_survivor_by_name(request):
@@ -51,8 +51,39 @@ def get_survivor_by_name(request):
             survivor_dict = serializer.data[0]
             inventory_dict = serializer_inventory.data[0]
             return Response({'survivor': survivor_dict, 'inventory': inventory_dict}, status=200)
-        return Response({'error': 'Survivor not found'}, status=404)
-    return Response({'error': 'Name parameter is required'}, status=400)
+        return Response({'error': 'Sobrevivente não encontrado'}, status=404)
+    return Response({'error': 'Parâmetro "Nome" é obrigatório'}, status=400)
+
+@api_view(['POST'])
+def report_infection(request):
+    reporter_name = request.data.get('reporter_name')
+    reported_survivor_name = request.data.get('reported_survivor_name')
+
+    if not reporter_name or not reported_survivor_name:
+        return Response({'error': 'O nome do repórter e o nome do sobrevivente relatado são obrigatórios'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        reporter = Survivor.objects.get(name=reporter_name)
+        reported_survivor = Survivor.objects.get(name=reported_survivor_name)
+    except Survivor.DoesNotExist:
+        return Response({'error': 'Sobrevivente não encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    if reporter == reported_survivor:
+        return Response({'error': 'O repórter e o sobrevivente relatado não podem ser os mesmos'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if InfectionReport.objects.filter(reporter=reporter, reported_survivor=reported_survivor).exists():
+        return Response({'error': 'Você já relatou este sobrevivente'}, status=status.HTTP_400_BAD_REQUEST)
+
+    InfectionReport.objects.create(reporter=reporter, reported_survivor=reported_survivor)
+
+    reports_count = reported_survivor.reports.count()
+    if reports_count >= 3:
+        reported_survivor.infected = True
+        reported_survivor.save()
+        return Response({'status': 'Sobrevivente marcado como infectado'}, status=status.HTTP_200_OK)
+
+    return Response({'status': 'Infecção reportada'}, status=status.HTTP_201_CREATED)
+
 
 class SurvivorViewSet(viewsets.ModelViewSet):
     queryset = Survivor.objects.all()
@@ -62,19 +93,43 @@ class SurvivorViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'])
     def update_location(self, request, name=None):
         survivor = self.get_object()
-        print("Localização atual:", survivor.last_location)
         survivor.last_location = request.data.get('last_location')
-        print("Nova localização:", survivor.last_location)
         survivor.save()
-        print("Localização atualizada:", survivor.last_location)
-        return Response({'status': 'location updated'})
+        return Response({'status': 'Localização atualizada'}, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
     def mark_infected(self, request, name=None):
         survivor = self.get_object()
-        survivor.infected = True
-        survivor.save()
-        return Response({'status': 'marked as infected'})
+        
+        if survivor.infected:
+            return Response({'error': 'Sobrevivente já infectado'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        reporter_name = request.data.get('reporter_name')
+        reported_survivor_name = survivor.name
+
+        if not reporter_name:
+            return Response({'error': 'Nome do repórter obrigatório'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            reporter = Survivor.objects.get(name=reporter_name)
+        except Survivor.DoesNotExist:
+            return Response({'error': 'Reportér não encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        if reporter == survivor:
+            return Response({'error': 'O repórter e o sobrevivente relatado não podem ser os mesmos'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if InfectionReport.objects.filter(reporter=reporter, reported_survivor=survivor).exists():
+            return Response({'error': 'Você já relatou este sobrevivente'}, status=status.HTTP_400_BAD_REQUEST)
+
+        InfectionReport.objects.create(reporter=reporter, reported_survivor=survivor)
+
+        reports_count = survivor.reports.count()
+        if reports_count >= 3:
+            survivor.infected = True
+            survivor.save()
+            return Response({'status': 'Sobrevivente marcado como infectado'}, status=status.HTTP_200_OK)
+        return Response({'status': 'Infecção reportada'}, status=status.HTTP_201_CREATED)
+
 
 class InventoryViewSet(viewsets.ModelViewSet):
     queryset = Inventory.objects.all()

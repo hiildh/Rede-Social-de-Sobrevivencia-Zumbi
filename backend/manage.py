@@ -2,7 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-import disable_deferrable  # Ensure this import is here to activate the custom schema editor
+import disable_deferrable  
 
 def main():
     """Run administrative tasks."""

@@ -1,11 +1,11 @@
 from django.db import models
 
 class Survivor(models.Model):
-    id = models.AutoField(primary_key=True)  # Chave primária de auto-incremento
+    id = models.AutoField(primary_key=True)  
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     gender = models.CharField(max_length=10)
-    last_location = models.CharField(max_length=255)  # Aumentando o tamanho do campo
+    last_location = models.CharField(max_length=255) 
     infected = models.BooleanField(default=False)
 
     def __str__(self):
@@ -18,6 +18,11 @@ class Survivor(models.Model):
     def mark_as_infected(self):
         self.infected = True
         self.save()
+
+class InfectionReport(models.Model):
+    reported_survivor = models.ForeignKey(Survivor, related_name='reports', on_delete=models.CASCADE)
+    reporter = models.ForeignKey(Survivor, on_delete=models.CASCADE)
+    reported_at = models.DateTimeField(auto_now_add=True)
 
 
 class Inventory(models.Model):
