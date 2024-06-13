@@ -33,7 +33,7 @@ class Inventory(models.Model):
     ammunition = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"Inventory of {self.survivor.name}"
+        return f"Inventorio de {self.survivor.name}"
 
     @property
     def total_points(self):
@@ -41,10 +41,10 @@ class Inventory(models.Model):
 
     def trade_items(self, other_inventory, offered_items, requested_items):
         if self.survivor.is_infected or other_inventory.survivor.is_infected:
-            return False, "Infected survivors cannot trade."
+            return False, "Sobreventes infectados não podem trocar itens."
 
         if self.calculate_points(offered_items) != self.calculate_points(requested_items):
-            return False, "Trade points do not match."
+            return False, "Pontos de troca não correspondem."
 
         self.update_inventory(offered_items, decrease=True)
         self.update_inventory(requested_items, decrease=False)
@@ -52,7 +52,25 @@ class Inventory(models.Model):
         other_inventory.update_inventory(requested_items, decrease=True)
         other_inventory.update_inventory(offered_items, decrease=False)
 
-        return True, "Trade successful."
+        return True, "Troca realizada com sucesso."
+
+    def trade_items_with(self, other_inventory, offered_items, requested_items):
+        if self.survivor.is_infected or other_inventory.survivor.is_infected:
+            return False, "Sobreviventes infectados não podem trocar itens."
+
+        offered_items_dict = {item['name'].lower(): item['quantity'] for item in offered_items}
+        requested_items_dict = {item['name'].lower(): item['quantity'] for item in requested_items}
+
+        if self.calculate_points(offered_items_dict) != other_inventory.calculate_points(requested_items_dict):
+            return False, "Pontos de troca não correspondem."
+
+        self.update_inventory(offered_items_dict, decrease=True)
+        self.update_inventory(requested_items_dict, decrease=False)
+
+        other_inventory.update_inventory(requested_items_dict, decrease=True)
+        other_inventory.update_inventory(offered_items_dict, decrease=False)
+
+        return True, "Troca realizada com sucesso."
 
     def calculate_points(self, items):
         points = 0

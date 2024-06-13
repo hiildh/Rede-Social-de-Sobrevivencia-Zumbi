@@ -53,7 +53,6 @@ export default {
                 const response = await fetch(`http://localhost:8000/api/survivors/get-by-name/?name=${name}`);
                 if (response.ok) {
                     this.survivor = await response.json();
-                    console.log(this.survivor);
                 } else {
                     throw new Error('Erro ao buscar dados do sobrevivente');
                 }
@@ -103,6 +102,7 @@ export default {
 }
 
 .inventario {
+    width: 100%;
     margin-top: 50px;
     background-color: #3cb37257;
     padding: 20px;

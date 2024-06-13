@@ -20,6 +20,9 @@
                 try {
                     const response = await fetch(`http://localhost:8000/api/survivors/get-by-name/?name=${this.survivorName}`);
                     if (!response.ok) {
+                        if (response.status === 401) {
+                            throw new Error('Sobrevivente infectado');
+                        }
                         throw new Error('Sobrevivente não encontrado');
                     }
                     const survivors = await response.json();
@@ -27,7 +30,7 @@
                         const survivor = survivors.survivor;
                         this.$router.push({ name: 'Dashboard', params: { name: survivor.name } });
                     } else {
-                        throw new Error('Sobrevivente não encontrado 2');
+                        throw new Error('Sobrevivente não encontrado');
                     }
                 } catch (error) {
                     alert('Erro: ' + error.message);

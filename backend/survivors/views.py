@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -7,7 +8,6 @@ from .serializers import SurvivorSerializer, InventorySerializer
 @api_view(['POST'])
 def register_survivor(request):
     if request.method == 'POST':
-        print("Dados recebidos:", request.data) 
         survivor_serializer = SurvivorSerializer(data=request.data)
         if survivor_serializer.is_valid():
             survivor = survivor_serializer.save()  
@@ -18,9 +18,7 @@ def register_survivor(request):
                 inventory_serializer.save()  
                 return Response(survivor_serializer.data, status=201)
             survivor.delete()  
-            print("Erros no inventário:", inventory_serializer.errors)  
             return Response(inventory_serializer.errors, status=400)
-        print("Erros no sobrevivente:", survivor_serializer.errors)  
         return Response(survivor_serializer.errors, status=400)
 
 @api_view(['GET'])
@@ -40,7 +38,6 @@ def survivor_inventory(request, survivor_id):
 
 @api_view(['GET'])
 def get_survivor_by_name(request):
-    print("Parâmetros recebidos:", request.query_params)
     name = request.query_params.get('name')
     if name:
         survivors = Survivor.objects.filter(name=name)
@@ -50,6 +47,8 @@ def get_survivor_by_name(request):
             serializer_inventory = InventorySerializer(inventory, many=True)
             survivor_dict = serializer.data[0]
             inventory_dict = serializer_inventory.data[0]
+            if survivors[0].infected:
+                return Response({'error': 'Sobrevivente infectado'}, status=401)
             return Response({'survivor': survivor_dict, 'inventory': inventory_dict}, status=200)
         return Response({'error': 'Sobrevivente não encontrado'}, status=404)
     return Response({'error': 'Parâmetro "Nome" é obrigatório'}, status=400)
@@ -134,3 +133,22 @@ class SurvivorViewSet(viewsets.ModelViewSet):
 class InventoryViewSet(viewsets.ModelViewSet):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
+    lookup_field = 'survivor'
+
+    @action(detail=True, methods=['post'])
+    def trade(self, request, survivor=None):
+        current_survivor = get_object_or_404(Survivor, name=survivor)
+        current_inventory = Inventory.objects.get(survivor=current_survivor)
+        other_survivor_username = request.data.get('other_inventory')
+        other_survivor = get_object_or_404(Survivor, name=other_survivor_username)
+        other_inventory = Inventory.objects.get(survivor=other_survivor)
+
+        offered_items = request.data.get('offered_items', {})
+        requested_items = request.data.get('requested_items', {})
+
+        success, message = current_inventory.trade_items_with(other_inventory, offered_items, requested_items)
+        if success:
+            return Response({'status': message}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+        

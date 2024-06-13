@@ -5,7 +5,6 @@
       <p>Compartilhe Recursos e Informações com Outros Sobreviventes em Tempos de Apocalipse.</p>
       <router-link to="/login" class="btn">Conecte-se com Outros Sobreviventes</router-link>
       <router-link to="/register" class="btn">Cadastre-se como Sobrevivente</router-link>
-      <router-link to="/mark-infected" class="btn">Marcar como Infectado</router-link>
     </div>
   </div>
 </template>

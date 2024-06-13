@@ -17,7 +17,7 @@ const routes = [
   { path: '/dashboard/:name', name: 'Dashboard', component: DashboardPage }, 
   { path: '/update-location/:name', component: UpdateLocation },
   { path: '/report-infection/:name', component: ReportInfection },
-  { path: '/trade-items', component: TradeItems },
+  { path: '/trade-items/:name', component: TradeItems },
   { path: '/reports', component: ReportsPage }
 ];
 

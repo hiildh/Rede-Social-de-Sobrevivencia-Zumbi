@@ -125,31 +125,15 @@ export default {
                 if (this.ammunition === 'more') {
                     ammunitionValue = this.ammunitionMore;
                 }
-                // Convertendo os valores do inventário para números
                 const water = parseInt(this.water);
                 const food = parseInt(this.food);
                 const medication = parseInt(this.medication);
                 const ammunition = parseInt(this.ammunition);
 
-                // Verificando se os valores convertidos são válidos
                 if (isNaN(waterValue) || isNaN(foodValue) || isNaN(medicationValue) || isNaN(ammunitionValue)) {
                     throw new Error('Os valores do inventário devem ser números válidos.');
                 }
 
-                console.log("Dados enviados para o servidor:", {
-                    name: this.name,
-                    age: this.age,
-                    gender: this.gender,
-                    last_location: `${this.latitude},${this.longitude}`,
-                    inventory: {
-                        water: water,
-                        food: food,
-                        medication: medication,
-                        ammunition: ammunition
-                    }
-                });
-
-                // Enviando os dados para o servidor
                 const response = await fetch('http://localhost:8000/api/register-survivor/', {
                     method: 'POST',
                     headers: {
@@ -182,11 +166,9 @@ export default {
 
         checkMoreThanTen(itemType) {
             if (this[itemType] === 'more') {
-                this[`${itemType}More`] = ''; // Limpa o campo de entrada
-                // Exibe o input de digitar a quantidade manualmente
+                this[`${itemType}More`] = ''; 
                 this.showManualInput[itemType] = true;
             } else {
-                // Esconde o input de digitar a quantidade manualmente
                 this.showManualInput[itemType] = false;
             }
         },
