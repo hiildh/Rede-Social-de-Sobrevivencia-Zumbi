@@ -34,14 +34,6 @@ def current_survivor(request):
     serializer = SurvivorSerializer(survivor)
     return Response(serializer.data)
 
-@api_view(['GET'])
-def survivor_inventory(request, survivor_id):
-    try:
-        inventory = Inventory.objects.get(survivor_id=survivor_id)
-        serializer = InventorySerializer(inventory)
-        return Response(serializer.data)
-    except Inventory.DoesNotExist:
-        return Response({'error': 'Inventorio não encontrado'}, status=404)
 
 @api_view(['GET'])
 def get_survivor_by_name(request):
