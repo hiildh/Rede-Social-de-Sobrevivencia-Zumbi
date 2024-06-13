@@ -1,4 +1,7 @@
+from django.forms import FloatField, IntegerField
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg, Count, Sum
+from django.db.models.functions import Coalesce
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -8,18 +11,22 @@ from .serializers import SurvivorSerializer, InventorySerializer
 @api_view(['POST'])
 def register_survivor(request):
     if request.method == 'POST':
+        name = request.data.get('name')
+        if Survivor.objects.filter(name=name).exists():
+            return Response({'error': 'Já existe um sobrevivente com este nome.'}, status=status.HTTP_400_BAD_REQUEST)
+
         survivor_serializer = SurvivorSerializer(data=request.data)
         if survivor_serializer.is_valid():
-            survivor = survivor_serializer.save()  
-            inventory_data = request.data.get('inventory') 
-            inventory_data['survivor'] = survivor.id  
+            survivor = survivor_serializer.save()
+            inventory_data = request.data.get('inventory', {})
+            inventory_data['survivor'] = survivor.id
             inventory_serializer = InventorySerializer(data=inventory_data)
             if inventory_serializer.is_valid():
-                inventory_serializer.save()  
-                return Response(survivor_serializer.data, status=201)
-            survivor.delete()  
-            return Response(inventory_serializer.errors, status=400)
-        return Response(survivor_serializer.errors, status=400)
+                inventory_serializer.save()
+                return Response(survivor_serializer.data, status=status.HTTP_201_CREATED)
+            survivor.delete()
+            return Response(inventory_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(survivor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def current_survivor(request):
@@ -152,3 +159,45 @@ class InventoryViewSet(viewsets.ModelViewSet):
         else:
             return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
         
+
+
+@api_view(['GET'])
+def reports(request):
+    total_survivors = Survivor.objects.count()
+    infected_count = Survivor.objects.filter(infected=True).count()
+    uninfected_count = total_survivors - infected_count
+    infected_percentage = (infected_count / total_survivors) * 100 if total_survivors > 0 else 0
+    uninfected_percentage = 100 - infected_percentage
+
+    inventories = Inventory.objects.select_related('survivor').all()
+
+    total_water = total_food = total_medication = total_ammunition = 0
+    for inventory in inventories:
+        total_water += inventory.water
+        total_food += inventory.food
+        total_medication += inventory.medication
+        total_ammunition += inventory.ammunition
+
+    if total_survivors > 0:
+        avg_water = total_water / total_survivors
+        avg_food = total_food / total_survivors
+        avg_medication = total_medication / total_survivors
+        avg_ammunition = total_ammunition / total_survivors
+    else:
+        avg_water = avg_food = avg_medication = avg_ammunition = 0
+
+    infected_points_lost = Inventory.objects.filter(survivor__infected=True).aggregate(
+        total_points_lost=Sum('water') * 4 + Sum('food') * 3 + Sum('medication') * 2 + Sum('ammunition')
+    )['total_points_lost'] or 0
+
+    report_data = {
+        'infected_percentage': infected_percentage,
+        'uninfected_percentage': uninfected_percentage,
+        'avg_water': avg_water,
+        'avg_food': avg_food,
+        'avg_medication': avg_medication,
+        'avg_ammunition': avg_ammunition,
+        'infected_points_lost': infected_points_lost
+    }
+
+    return Response(report_data)

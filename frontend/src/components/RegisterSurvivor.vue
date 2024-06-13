@@ -125,10 +125,6 @@ export default {
                 if (this.ammunition === 'more') {
                     ammunitionValue = this.ammunitionMore;
                 }
-                const water = parseInt(this.water);
-                const food = parseInt(this.food);
-                const medication = parseInt(this.medication);
-                const ammunition = parseInt(this.ammunition);
 
                 if (isNaN(waterValue) || isNaN(foodValue) || isNaN(medicationValue) || isNaN(ammunitionValue)) {
                     throw new Error('Os valores do inventário devem ser números válidos.');
@@ -154,7 +150,8 @@ export default {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Erro ao cadastrar sobrevivente');
+                    const errorData = await response.json();
+                    throw new Error('Erro ao cadastrar sobrevivente: ' + errorData.error);
                 }
 
                 alert('Sobrevivente cadastrado com sucesso');
