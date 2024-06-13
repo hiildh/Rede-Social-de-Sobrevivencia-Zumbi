@@ -2,7 +2,7 @@
 
 ## Demonstração
 
-[![Demonstração do Projeto](https://lh3.googleusercontent.com/u/0/drive-viewer…rpQIsDC-8y4uNUWYcYlTwiHt8c=w1920-h1080-k-rw-v1-pd)](https://drive.google.com/file/d/17C2c8IKaCHPpeElp7_KSDDdaOIr-onmt/view?usp=sharing)
+[![Demonstração do Projeto](zssn-rede-social-de-sobrevivencia-zumbi-google-chrome-2024-06-13-18-29-41_f3QnpL55)](https://drive.google.com/file/d/17C2c8IKaCHPpeElp7_KSDDdaOIr-onmt/view?usp=sharing)
 
 
 ## Descrição do Projeto
