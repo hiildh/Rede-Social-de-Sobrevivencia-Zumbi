@@ -2,7 +2,7 @@
 
 ## Demonstração
 
-[![Demonstração do Projeto](zssn-rede-social-de-sobrevivencia-zumbi-google-chrome-2024-06-13-18-29-41_f3QnpL55.gif)](https://drive.google.com/file/d/17C2c8IKaCHPpeElp7_KSDDdaOIr-onmt/view?usp=sharing)
+[![Demonstração do Projeto](ZSSN-Rede-Social-de-Sobrevivência-Zumbi-Google-Chrome-2024-06-13-18-29-41.gif)](https://drive.google.com/file/d/17C2c8IKaCHPpeElp7_KSDDdaOIr-onmt/view?usp=sharing)
 
 
 ## Descrição do Projeto
