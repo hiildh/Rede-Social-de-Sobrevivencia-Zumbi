@@ -22,7 +22,7 @@ Este projeto é uma rede social para sobreviventes de um apocalipse zumbi compar
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/zombie-survivor-social-network.git](https://github.com/hiildh/Rede-Social-de-Sobrevivencia-Zumbi.git
+   git clone https://github.com/hiildh/Rede-Social-de-Sobrevivencia-Zumbi.git
    cd zombie-survivor-social-network
 2. Instale as dependências Python:
     ```bash
